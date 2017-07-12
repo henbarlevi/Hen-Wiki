@@ -8,13 +8,16 @@ import * as Rx from 'rxjs';
 })
 export class AppComponent {
   constructor() {
-    //this.creatObservable();
-    //this.createIntervalObservable();
+    //this.creatObservable(); //  new Rx.Observable ,subscribe
+    //this.createIntervalObservable(); //, Observable.interval , unsubscribe, next,complete
     // this.tryMyTakeFilter();
     // this.bultInOperators();
     // this.subjects();
     //this.hotVsCold();
-    this.builtInOperators2();
+    //this.builtInOperators2();
+    //this.combineObservables();
+    this.errorHandling();
+
   }
   title = 'app works!';
   creatObservable() {
@@ -173,7 +176,7 @@ export class AppComponent {
   hotVsCold() {
     // //HOT - u not expected to recieve history data:
     // const keyUps$ = Rx.Observable.fromEvent(document.body, 'keyups');
-    // //Cold - when u subscribe to it - the it produce values and you excpect to recieve all vlaues from start to finish
+    // //Cold - when u subscribe to it - then it produce values and you excpect to recieve all vlaues from start to finish
     // const interval$ = Rx.Observable.interval(400);
     // //every time we subscribe to the interval we got a new set timeout
 
@@ -338,18 +341,18 @@ export class AppComponent {
     // //and it will print valu for each source data
     // // but because Reduce on the other hand wait for the source to finish it wont do anything
     // Rx.Observable.interval(100).reduce((p, c) => p + c).subscribe(i=>console.log('reduce'+i));//OUTPUT: NONE
-    
+
     // //--------------------------------------------------------------------------------------------------
     //Buffer + ToArray
-    
+
     // Rx.Observable.interval(100).bufferCount(10)
     // .subscribe(console.log); //OUTPUT : [0,1,2....9], [9,10....19],...   
-    
+
     // Rx.Observable.interval(100).bufferTime(300)
     // .subscribe(console.log); //OUTPUT : [0,1,2], [4,5,6],...   
-    
+
     //The buffer method periodically gathers items emitted by a source Observable into buffers, and emits these buffers as its own emissions.
-    
+
     // const stopSubject$ = new Rx.Subject();
     // Rx.Observable.interval(100).buffer(stopSubject$).subscribe(console.log);// OUTPUT [0,1,2,3,4]
     // //the buffer method get an observable that singles when to flush the data
@@ -357,9 +360,88 @@ export class AppComponent {
     //   stopSubject$.next();
     // }, 500); 
 
-    Rx.Observable.range(1,10)
-    .toArray().subscribe(console.log); //OUTPUT : [1,2...10]
+    // Rx.Observable.range(1,10)
+    // .toArray().subscribe(console.log); //OUTPUT : [1,2...10]
     //toArray collect all data stream into array and pass it forward when observable finished
-}
+    // //--------------------------------------------------------------------------------------------------
+    // first ,last ,skip , take ,takeUntil, skipUntil
+    const observable$ = Rx.Observable.create(observer => { //NOTE -cold observable
+      observer.next(1);
+      observer.next(2);
+      observer.next(3);
+      observer.next(4);
+
+    });
+
+    // observable$.first().subscribe(console.log); //OUTPUT 1 - NOTE - will get error if no element exists
+    // observable$.last().subscribe(console.log); //OUTPUT none - it waits unti it complete - NOTE - will get error if no element exists
+    //observable$.single().subscribe(console.log); //OUTPUT error - there isnt single element, there are multi
+
+    // observable$.skip(2).subscribe(console.log); //OUTPUT 3,4 -
+    // observable$.take(3).subscribe(console.log); //OUTPUT 1,2,3
+
+    // observable$.takeUntil(i=>i<3).subscribe(console.log); //OUTPUT 1,2,3
+
+    //Rx.Observable.interval(100).skipWhile(i=>i<4).takeWhile(i=>i<10).subscribe(console.log);//OUTPUT 4...9
+    Rx.Observable.interval(100).skipUntil(Rx.Observable.timer(350)).takeUntil(Rx.Observable.timer(1000)).subscribe(console.log);//OUTPUT 3...8
+
+
+  }
+
+  combineObservables() {
+    //http://rxmarbles.com/#zip
+    Rx.Observable.range(1, 10)
+      .zip(Rx.Observable.interval(1000), (left, right) => {//NOTE - left -first observable items , right -second observable items
+        return `got ${left} value , after ${right} secondes`
+      })
+      .subscribe(console.log); //OUTPUT - 'got 1 after 0 secondes' , 'got 2 after 1 seconds'
+
+    //http://rxmarbles.com/#withLatestFrom
+    //Rx.Observable.interval(200).withLatestFrom(Rx.Observable.interval(500)).subscribe(console.log);//OUTPUT -after 200mls [1,0], after "" [2,1],[3,1],[4,2],[5,2]
+    //http://rxmarbles.com/#combineLatest
+    //similar to withLatest but it emit value wether one of the observables emits data
+    Rx.Observable.interval(200).combineLatest(Rx.Observable.interval(500)).subscribe(console.log);//OUTPUT -after 200mls [1,0],[2,0],[3,0],-->[4,0],[4,1]<--
+
+  }
+  errorHandling() {
+    // //if we dont handle errors -> the observable will stop is streaming and will unsubscriibe
+    // Rx.Observable.concat(
+    //   Rx.Observable.of(42),
+    //   Rx.Observable.throw(new Error('blah')),
+    //   Rx.Observable.of(10)
+    // ).subscribe(console.log); // 42 , Error raise! . not getting 10 - observable got unsubscribed automatically
+    //-----------------------------
+    //simulate error raise:
+    let getapi = () => {
+      return new Promise((res, rej) => {
+        setTimeout(function () {
+          rej(new Error('ERORR!!!'));
+        }, 100);
+      })
+    }
+
+    Rx.Observable.fromPromise(getapi())
+      .catch(err => {
+        console.log(err);
+        return Rx.Observable.of(err);
+      })
+      .subscribe(item => console.log('ITEM :' + item)) //OUTPUT - ERROR!! :err descripton ,'ITEM Error :ERROR!!'
+    //---------------------------------
+    //simulaet error raise :
+    let getapiObservable = () => {
+      return new Rx.Observable((observer) => {
+        console.log('Getting Api');
+        setTimeout(function () {
+          observer.error(new Error('ERORR **'))
+        }, 100);
+      })
+    }
+
+    getapiObservable()
+    .retry(3) // retry the request 3 times if it Fails
+    .catch(err=>{console.log('Error Raised :' +err); return Rx.Observable.of(err)})
+    .subscribe(i => {console.log('item :' + i)})//OUTPUT : Getting Api * 3 , Error Raised : Error ERROR **, item :Error :Error**
+    //NOTE - if we wont catch - it still retry 3 times but the error will be throw to console
+  }
 
 }

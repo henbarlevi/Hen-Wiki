@@ -5,7 +5,7 @@ import * as Rx from 'rxjs';
   selector: 'jq-component',
   templateUrl: './jquery.component.html',
 })
-export class AppComponent {
+export class JQComponent {
   constructor() {
  
   }
