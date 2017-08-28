@@ -5,9 +5,12 @@ import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 import { rxjsExmaples} from './rxjs/rxjs';
+import { ScssComponent } from './scss-sbs/scss.component';
+
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ScssComponent
   ],
   imports: [
     BrowserModule,
