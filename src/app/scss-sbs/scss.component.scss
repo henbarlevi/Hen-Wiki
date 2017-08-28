@@ -58,3 +58,28 @@ h1{
 #riddle2{
     border-color: lighten(brown,70%)
 }
+
+
+//======== if and for loop
+$riddle-color:blue;
+@if $riddle-color == blue {
+  #riddle {
+    background-color: green;
+  }
+} @else {
+  #riddle {
+    background-color: orangered;
+  }
+}
+ 
+// We can use for loops to change as we iterate
+ 
+$prct-yellow: 5%;
+ 
+@for $i from 1 through 14 {
+  #vert-nav ul li:nth-child(#{$i}){
+    background-color: mix(yellow, white, $prct-yellow);
+  }
+ 
+  $prct-yellow: $prct-yellow + 5%
+}
