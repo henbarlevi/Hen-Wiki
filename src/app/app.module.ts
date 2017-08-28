@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
-
+import { rxjsExmaples} from './rxjs/rxjs';
 @NgModule({
   declarations: [
     AppComponent
@@ -14,7 +14,7 @@ import { AppComponent } from './app.component';
     FormsModule,
     HttpModule
   ],
-  providers: [],
+  providers: [rxjsExmaples],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

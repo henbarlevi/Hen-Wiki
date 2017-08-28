@@ -1,0 +1,60 @@
+@import '../../styles/_variables.scss';
+@import '../../styles/_mixins.scss';
+
+$red:#FF0000;
+
+h1{
+    color:$red;
+} 
+//========nesting
+.left-sidebar-links{
+    a{
+        display: block;
+        color:$red;
+       
+    }
+     & :hover{
+            color:black;
+        }
+}
+
+.left-sidebar-links{
+    border-bottom: 2px solid orange;
+   
+}
+//=========Extend/Inheritance
+#riddle{
+    padding: 20px;
+    margin-top:10px;
+    color:$midnight-blue;
+    font-weight: bolder;
+    font-size:20px;
+}
+#riddle-answer{
+    @extend #riddle;
+    color:purple;
+}
+//we can create abstract style set and make other elements use it
+
+
+
+%dashed-box{
+    border : 2px dashed;
+    margin :10px;
+    @include border-radius(40px);//with mixin
+
+}
+#riddle{
+    @extend %dashed-box;
+}
+%dotted-box{
+    border : 2px dotted;
+    margin :10px;
+}
+#riddle2{
+     @extend %dotted-box;
+}
+
+#riddle2{
+    border-color: lighten(brown,70%)
+}
