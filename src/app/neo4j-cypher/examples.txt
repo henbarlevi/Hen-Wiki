@@ -1,0 +1,119 @@
+*/
+/**
+ 1 MATCH (n) DETACH DELETE (n) - delete all nodes in db
+ 2 MERGE (a:ACTOR {id:99}) - create this node if not exist 
+ 3 MATCH (m:MOVIE {name:"fight club"}) WITH m MATCH (m)<-[:ACTED_IN]-(a:ACTOR) return m,a  - return all actors that played in the fight club movie (and the movie node)
+ 4 MATCH (m:MOVIE {name:"fight club"}) WITH m MATCH (m)<-[:ACTED_IN]-(a:ACTOR) return m,count(a)  - return the number of actors that played in the fight club movie (and the movie node)
+ 5 MERGE(a:ACTOR{id:98})
+        ON CREATE
+        SET a.name="Mark Hamill", a.counter=0
+        ON MATCH
+        SET a.counter=a.counter+1
+        return a
+ 6 MATCH (m:MOVIE) WITH m MATCH (m) <-[ACTED_IN]- (a:ACTOR) return m.title, COLLECT(a.name) as names - return movie title and a collection of the actors names that played that movie
+ 7 MATCH (a:ACTOR) OPTINAL MATCH (a)-[r]->() return a.name type(r) - return actor name and the relationship type if exist (if not - type(r)=null)
+ 8 MATCH (a)-->(b)-->(c) return a,b,c LIMIT 100 - return the nodes with this pattern - limit the result returned to 100
+ 9 Different ways to write the same query:
+   - MATCH (a)-[:ACTED_IN]->(m)<-[:DIRECTED]-(d) return a.name AS actor , m.title as MOVIE, d.name AS director
+   - MATCH (a)-[:ACTED_IN]->(m), (m)<-[:DIRECTED]-(d) return a.name AS actor , m.title as MOVIE, d.name AS director
+ 10 we can return a path
+    - MATCH p=(a)-[:ACTED_IN]->(m)<-[:DIRECTED]-(d)  RETURN p
+    - MATCH p=(a)-[:ACTED_IN]->(m)<-[:DIRECTED]-(d)  RETURN nodes(p) - return the nodes of the path
+    - MATCH p=(a)-[:ACTED_IN]->(m)<-[:DIRECTED]-(d)  RETURN rels(p) - return the relationships of the path
+    - MATCH p1=(a)-[:ACTED_IN]->(m), p2 =(m)<-[:DIRECTED]-(d) RETURN p1,p2
+ 
+ ===================Aggregation=================================
+  1  return an actor and a director and the number of movies that they where together
+    -MATCH (a)-[:ACTED_IN]->(m)<-[:DIRECTED]-(d) RETURN a.name ,d.name,count(*) 
+    return the same but get the 5 with the biggest count value
+    MATCH (a)-[:ACTED_IN]->(m)<-[:DIRECTED]-(d) RETURN a.name ,d.name,count(*) AS Count ORDER BY count DESC LIMIT 5
+  
+  2 return the movie titles where keenu reeves played as neo
+    MATCH (a:ACTOR {name:"Keanu Reeves"})-[r:ACTED_IN]->(movie) WHERE "Neo" IN (r.roles) return movie.title
+    different way to same query but with better performance:
+    MATCH (a:ACTOR {name:"Keanu Reeves"})-[r:ACTED_IN]->(movie) WHERE ANY(x IN r.roles WHERE x="Neo")
+    return movie.title
+
+  3 actors who worked with gene and were directors of their own films
+  MATCH (gene:Person {name:"Gene Hackman"})-[:ACTED_IN]->(m)<-[:ACTED_IN]-(director)
+  WHERE (director)-[:DIRECTED]->() RETURN DISTINCT director.name
+  
+  4 Actors who worked with keanu but no when he was also working with Hugo
+   MATCH (keanu:ACTOR {name:"Keanu Reeves"})-[:ACTED_IN]->(m)<-[:ACTED_IN]-(actor) ,
+            (hugo:ACTOR {name:"Hugo Weaving"}) WHERE NOT (hugo)-[:ACTED_IN]->(m)
+            RETURN DISTINCT actor.name
+
+
+
+ 
+
+The comparison operators comprise:
+
+equality: =
+inequality: <>
+less than: <
+greater than: >
+less than or equal to: <=
+greater than or equal to: >=
+IS NULL
+IS NOT NULL
+String-specific comparison operators comprise:
+
+STARTS WITH: perform case-sensitive prefix searching on strings
+ENDS WITH: perform case-sensitive suffix searching on strings
+CONTAINS: perform case-sensitive inclusion searching in strings
+
+=====================CREATE / UPDATE====================
+*create node:
+CREATE (m:MOVIE {title :"twilight",released:2010});
+*adding/updating props:
+MATCH (m:MOVIE {title :"twilight"}) SET m.rating =5 return m;
+*create relationship:
+MATCH (m:MOVIE {title:"fight club"}) , (brad:ACTOR {name:"Brad Pit"})
+MERGE (brad)-[ACTED_IN]->(m) 
+    ON CREATE 
+    SET r.roles=["Tyler"]
+
+*update relationship:
+udpate kevin bacon role in "mystic river" movie from 'sean' to 'sean devine' without touching his other roles in this movie
+MATCH (kevin:ACTOR {name:"kevin bacon"})-[r:ACTED_IN]->(m:MOVIE {name:"mystic river"})
+SET r.roles = [n in r.roles WHERE n <>"Sean"]+"Sean Devine" 
+
+cypher with Reg ex-------------
+MATCH (m:MOVIE {title:"matrix"})<-[ACTED_IN]-(a:ACTOR ) WHERE a.name='.*Emil.*'; - return the paths where the movie is matrix and the actor name contain the value Emil
+
+=====================DELETE =============================
+YOU CANNOT DELETE a node before you remove his relationships
+MATCH (emil:ACTOR {name:"Emil Eifrem"})-[r]-() DELETE r -remove node relationships
+MATCH (emil:ACTOR {name:"Emil Eifrem"}) DELETE emil 
+OR we can write it in one query
+MATCH (emil:ACTOR {name:"Emil Eifrem"}) OPTINAL MATCH (emil)-[r]-() DELETE r ,emil
+OR we can use DETACH
+MATCH (emil:ACTOR {name:"Emil Eifrem"}) DETACH DELETE emil 
+
+
+
+====================more examples===========
+Unique and MERGE:
+MERGE = MATCH or CREATE
+adding multiple relationships:
+*if actors played together in a movie , they KNOW each other, add KNOWS relationship between actors:
+MATCH (a:Actor)-[:ACTED_IN]->(m)<-[:ACTED_IN]-(b:Actor)
+CREATE UNIQUE (a)-[:KNOWS]-(b) - NOTICE we have to UNIQUE otherwise it will create muti relationships if the same pair of actors
+played together in more than 1 movie, notice we created simetrical relationship (a KNOWS b , b KNOWS a)- by not providing a direction 
+*MATCH (a)-[:ACTED_IN | :DIRECTED]->(m)<-[:ACTED_IN | :DIRECTED]-(b)
+CREATE UNIQUE (a)-[:KNOWS]-(b) - create knows relationship actor or director who worked together
+variable-length paths:
+*friends of friends of keanu
+MATCH (keanu:ACTOR {name : "keanu reeves"})-[:KNOWS*2]-(fof) RETURN DISTINCT fof.name
+*friends of friends of keanu that are not firends of keanu
+MATCH (keanu:ACTOR {name : "keanu reeves"})-[:KNOWS*2]-(fof) 
+where NOT (fof)-[:KNOWS]-(keanu) RETURN DISTINCT fof.name
+SHOTEST PATH :
+*MATCH (bacon:ACTOR {name "kevin bacon"}), (charlize:ACTOR {name: "charilize theron"}),
+        p=shortestPath((charilize)-[:KNOWS*]-(bacon)) RETURN length(p);
+
+*find middle nodes that connect kevin bacon and charlize theron:
+(bacon:ACTOR {name "kevin bacon"}), (charlize:ACTOR {name: "charilize theron"}),
+        paths=((charilize)-[:KNOWS*]-(bacon)),
+        RETURN [n in NODES(paths)[1..-1] | n.name] AS names 

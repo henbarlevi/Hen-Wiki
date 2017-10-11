@@ -1,0 +1,37 @@
+\d - digit -0-9
+\w - word - A-Z a-z 0-9
+\W - any non word - not from A-Z a-z 0-9
+\s - white space/tab
+\S - not white space
+. - any character
+
+quantifiers
+* - 0 or more chars
++ - 1 or more chars
+? - 0 or 1
+{n} - the number of chars
+{min,max}
+
+
+position 
+^ - begining of line
+$ - end of line
+\b - word boundry
+
+character classes
+[] - or - for exmaple [abc] - match a or b or c
+alternation
+(|) - or - for example (net|com) match net or com
+-------examples
+\b\w{5}\b - find any 5 letter words (babys,tom3y,arAx9)
+colors? - find color\colors words
+\w+$- all the words at the end of a line
+^\w+- all the words at the beginging of a line
+^\w+$- all single word in aline 
+[.-] - all . or - chars
+[0-5]{3} - all 3 numbers that contain only 0-5  (534,511 etc..)
+
+
+-------special cases
+[a-c] - all chars from a through c (NOTICE that - can behave like literal or not literal dash)
+[^a-z] - all chars that are NOT a through (^ instead [] behave differently if its at the begining)
