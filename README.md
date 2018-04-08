@@ -1,6 +1,8 @@
 ### 1.  [Rxjs☘️](#Rxjs)
 ### 2. [Jquery☘️](#Jquery)
 ### 3. [Design Patterns☘️](#designpatterns)
+### 4. [Neo4j (Cypher)☘️](#Cypher)
+### 5. [Regex☘️](#Regex☘️)
 
 
 # ===============================
@@ -466,3 +468,46 @@
 # ===============================
 # Design Patterns <a name="designpatterns"></a> ☘️ 
 # ===============================
+# ===============================
+# Cypher <a name="Cypher"></a> ☘️ 
+# ===============================
+# ===============================
+# Regex <a name="Regex"></a> ☘️ 
+# ===============================
+- \d - digit -0-9
+- \w - word - A-Z a-z 0-9
+- \W - any non word - not from A-Z a-z 0-9
+- \s - white space/tab
+- \S - not white space
+- . - any character
+
+> #### quantifiers
+- <b>*</b> -  0 or more chars
+- <b>+</b> - 1 or more chars
+- <b>?</b> - 0 or 1
+- <b>{n}</b> - the number of chars
+- <b>{min,max}</b>
+
+
+> #### position 
+<b>^</b>- begining of line <br>
+<b>$</b>- end of line<br>
+<b>\b</b> - word boundry<br>
+
+character classes
+[] - or - for exmaple [abc] - match a or b or c
+alternation
+(|) - or - for example (net|com) match net or com
+#### examples
+<b> \b\w{5}\b</b> - find any 5 letter words (babys,tom3y,arAx9)
+<b>colors? </b>- find color\colors words
+<b>\w+$ </b>- all the words at the end of a line
+<b>^\w+ </b>- all the words at the beginging of a line
+<b>^\w+$ </b>- all single word in aline 
+<b>[.-] </b>- all . or - chars
+<b>[0-5]{3} </b>- all 3 numbers that contain only 0-5  (534,511 etc..)
+
+
+-------special cases
+- [a-c] - all chars from a through c (NOTICE that - can behave like literal or not literal dash)
+- [^a-z] - all chars that are NOT a through (^ instead [] behave differently if its at the begining)
