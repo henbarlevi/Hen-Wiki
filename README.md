@@ -1,10 +1,10 @@
-### 1.  [Rxjs](#Rxjs)
+### 1.  [Rxjs☘️](#Rxjs☘️)
 ### 2. [Jquery](#Jquery)
 ### 3. [Design Patterns](#designpatterns)
 
 
 # ===============================
-# Rxjs ☘️ 
+# Rxjs☘️ 
 # ===============================
 
 #### How to create an Observable:
