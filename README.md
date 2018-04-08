@@ -5,12 +5,25 @@
 
 # ===============================
 # Rxjs  <a name="Rxjs"></a>☘️ 
+> - [create an Observable](Rxjs.a)
+> - [Interval Observable]()
+> - [Your Own Operator]()
+> - [Builtin Operators]()
+> - [Builtin Operators Part 2]()
+> - [Subjects]()
+> - [Hot Vs Cold]()
+> - [Combine Observables]()
+> - [Error Handling]()
+
+
+
+
+
 # ===============================
 
-### How to create an Observable:
+### How to create an Observable  <a name="Rxjs.a"></a>:
 ```ts
-  creatObservable() {
-      //create observable
+    //create observable
     const observable = new Rx.Observable(observer => {
       console.log('creating observable')
       setTimeout(function () {
@@ -37,7 +50,6 @@
             () => { console.log('completed') }
         });
     }, 2000);
-  }
   ```
 ### create Interval Observable:
 ```ts
