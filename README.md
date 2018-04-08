@@ -6,14 +6,14 @@
 # ===============================
 # Rxjs  <a name="Rxjs"></a>☘️ 
 > - [create an Observable](#Rxjs.a)
-> - [Interval Observable]()
-> - [Your Own Operator]()
-> - [Builtin Operators]()
-> - [Builtin Operators Part 2]()
-> - [Subjects]()
-> - [Hot Vs Cold]()
-> - [Combine Observables]()
-> - [Error Handling]()
+> - [Interval Observable](#Rxjs.b)
+> - [Your Own Operator](#Rxjs.c)
+> - [Builtin Operators](#Rxjs.d)
+> - [Builtin Operators Part 2](#Rxjs.e)
+> - [Subjects](#Rxjs.f)
+> - [Hot Vs Cold](#Rxjs.g)
+> - [Combine Observables](#Rxjs.h)
+> - [Error Handling](#Rxjs.i)
 
 
 
@@ -51,7 +51,7 @@
         });
     }, 2000);
   ```
-### create Interval Observable:
+### create Interval Observable <a name="Rxjs.b"></a>:
 ```ts
 
     const observable = Rx.Observable.interval(1000);
@@ -63,7 +63,7 @@
     }, 10000);
     //OUTPUT : 0,1,2,3,4,5,6,7,8,9
 ```
-### How to Create Your Own Operator
+### How to Create Your Own Operator <a name="Rxjs.c"></a>
 ```ts
   //what an operator does is simply wrapping the observable with new observable that filter that passed stream from the inner observable
   take$(observable: Rx.Observable<number>, amount) {
@@ -95,7 +95,7 @@
       .subscribe((item) => { console.log('from take filter :' + item) })
   }
 ```
-### Rxjs Builtin Operators
+### Rxjs Builtin Operators <a name="Rxjs.d"></a>
 
 ```ts
     //interval + take:
@@ -121,7 +121,7 @@
 
     //fs.readdir('../app',(err,files)=>console.log(files));
   ```
-### Subjects
+### Subjects <a name="Rxjs.f"></a>
   
 ```ts
     //subject is like an observable that we can control when it emits values
@@ -185,7 +185,7 @@
 
   
   ```
-### Hot vs Cold Observable
+### Hot vs Cold Observable <a name="Rxjs.g"></a>
 
 ```ts
     // //HOT - u not expected to recieve history data:
@@ -263,7 +263,7 @@
     const subs3 = publish$.subscribe((i) => console.log(`refCount sub3 :${i}`));
     //NOTE observabke$.share() = observable$.publish().refCount()
   ```
- ### more builtin operators
+ ### more builtin operators <a name="Rxjs.e"></a>
 ```ts
     /*====== do , map finally =======*/
     Rx.Observable.range(1, 10)
@@ -399,7 +399,7 @@
   }
 
 ```
-### Combine Observables
+### Combine Observables <a name="Rxjs.h"></a>
 ```ts
     //http://rxmarbles.com/#zip
     Rx.Observable.range(1, 10)
@@ -416,7 +416,7 @@
 
   }
   ```
-### Error Handling
+### Error Handling <a name="Rxjs.i"></a>
 ```ts
   
     // //if we dont handle errors -> the observable will stop is streaming and will unsubscriibe
