@@ -462,9 +462,85 @@
 # ===============================
 # ===============================
 # Design Patterns <a name="designpatterns"></a> ☘️ 
-> - [Strategy](#designpatterns.a)
+> - [Strategy](#designpatterns.strategy)
 > - [Decorator](#designpatterns.decorator)
 # ===============================
+## General Guide
+- avoid duplicate code
+- eliminate any technics that cause 1 class to affect others - super class shouldn't break code in subClass and vise versa
+---
+## <b>Strategy</b> <a name="designpatterns.strategy"></a>
+#### <b> Should be Used When </b> - you want to define a class that will have one behaviour from a list of behaviours <br> for exmaple : Define a specific animal class (bird for ex) that will be able to choose from the following behaviours: 
+- not flying
+- fly slow
+- fly fast
+#### <b> Properties </b> :
+- avoid duplicate code and conditianls
+- keeps class changes from forcing other class changes
+- can hide complicated/secret code from the user
+- you can change object behaviour at run time
+- NEGATIVE : increase number of objects/classes
+ ```ts
+/**FLYING STRATEGY */
+interface Fly {
+    fly(): string
+}
+//#1
+class ItFlySlow implements Fly {
+    fly(): string {
+        return 'fly slow'
+    }
+}
+//#2
+class ItFlyFast implements Fly {
+    fly(): string {
+        return 'fly fast'
+    }
+}
+//#3
+class cantFly implements Fly {
+    fly(): string {
+        return 'not flying';
+    }
+}
+
+/**ABTRACT CLASS USING THE STRATEGIES */
+abstract class Animal {
+    constructor(private flyBehaviour: Fly) {
+
+    }
+
+    public TryFly(): string {
+        return this.flyBehaviour.fly();
+    }
+    /**To be able to change beaviour at run time */
+    set flyAblity(flyBehaviour: Fly) {
+        this.flyBehaviour = flyBehaviour;
+    }
+}
+
+/**SUB CLASSES */
+//Dog
+class Dog extends Animal {
+    constructor() {
+        super(new cantFly());
+    }
+}
+//Bird
+class Bird extends Animal {
+    constructor() {
+        super(new ItFlyFast());
+    }
+}
+
+/*RUN CODE;*/
+const dog:Dog = new Dog();
+const bird:Dog = new Dog();
+//change dog behaviour at run time
+dog.flyAblity = new ItFlySlow();
+
+ ```
+ ---
 ## <b>Decorator</b> <a name="designpatterns.decorator"></a>
 > ### the decorator allows you to modify object dynamically
 #### <b> Should be Used When </b> - you want the capbabilities of inheritance with subclasses , but you need to add functionality at runtime
@@ -527,7 +603,7 @@ class olivsTopping extends ToppiingDecorator {
         return this.tempPizza.Cost + 2.00;
     };
 }
-
+// RUN CODE:
 const plainPizza: PlainPizza = new PlainPizza();
 const pizzaWithCheese = new CheeseTopping(plainPizza);
 const pizzaWithCheeseAndOlivs = new olivsTopping(pizzaWithCheese);
