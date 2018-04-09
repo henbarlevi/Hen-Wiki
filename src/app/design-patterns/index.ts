@@ -1,6 +1,6 @@
 import { iFighter,KickAbility,PunchAbility,BeginnerFighter,ExpertFighter} from './decorator';
 
-
+import * as dec from './decorator'
 
 export function runExamples(){
     decoratorExample();
