@@ -6,8 +6,6 @@
  that will represent different types of remote controls
  This allows me to use an infinite variety of devices and remotes
 */
-
-
 abstract class EntertainmentDevice {
     volumeLevel: number = 0;
     constructor(public deviceState: number, public maxSetting: number) { }
@@ -51,6 +49,7 @@ class TVDevice extends EntertainmentDevice {
         console.log('TV Paused');
     }
 }
+
 class DvDDevice extends EntertainmentDevice {
 
     buttonFivePressed(): void {
@@ -83,10 +82,7 @@ abstract class RemoteControl {
     buttonSixPressed(): void {
         this.device.buttonSixPressed();
     }
-
-
-    abstract buttonNinePressed(): void;//in each remote - 9 behave differently
-
+    abstract buttonNinePressed(): void;//in each remote - btn 9 behave differently
 }
 
 /*
@@ -110,10 +106,6 @@ If I decide I want to further extend the remote I can
         this.device.pause();
     }
  }
-
-
-
-
 //RUN CODE
 /**as you can see i can combine ANY Entertainment device WITH ANY remote 
  * and by using the bridge pattern the code above is minimal

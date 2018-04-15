@@ -471,6 +471,9 @@
 > - [Strategy](#designpatterns.strategy)
 > - [Decorator](#designpatterns.decorator)
 > - [Adapter](#designpatterns.adapter)
+> - [Factory Method](#designpatterns.factory-method)
+> - [Bridge](#designpatterns.designpatterns.bridge)
+
 
 # ===============================
 ## General Guide
@@ -829,6 +832,83 @@ remotePause2.buttonNinePressed();
 
 
  ```
+ ---
+ ## <b>Factory Method</b> <a name="designpatterns.factory-method"></a>
+> ### the Factory method let you encapsulate object creation business logic
+#### <b> Should be Used When </b> 
+- when you want a method to return one of serveral possible classes that share a common Super classtime/interface
+- when you dont know ahead of time what class object you need + all the classes are in the same subclass hierarchy
+#### <b> Properties </b> :
+- let chose class creation at run time 
+- encapsulate object creation
+#### <b> Example </b>
+we are building a game and we need a way to craete the enemies of the player but we want to create them randomly <br> and we dont know what concrete enemy class we need
+ ```ts
+interface iEnemy {
+    Fire(): void;
+    Move(): void;
+}
+
+
+class SmallEnemy implements iEnemy {
+    Fire(): void {
+        console.log('enemy do small damage');
+    }
+    Move(): void {
+        console.log('enemy moving fast')
+    }
+}
+class BigEnemy implements iEnemy {
+    Fire(): void {
+        console.log('enemy do Big damage');
+    }
+    Move(): void {
+        console.log('enemy moving Slow')
+    }
+}
+
+
+/**
+ * Factory
+ */
+interface iEnemyFactory {
+    createEnemy(): iEnemy;
+}
+//factory 1
+class RandomEnemyFactory implements iEnemyFactory {
+    createEnemy(): iEnemy {
+        return Math.random() > 0.5 ? new BigEnemy() : new SmallEnemy();
+    }
+}
+//factory 2
+/**@description craete enemy based on his previous creations , will always try to equalize the creations number from each type */
+class BalanceEnemyFactory implements iEnemyFactory {
+    private static smallEnemies: number = 0;
+    private static bigEnemies: number = 0
+    createEnemy(): iEnemy {
+        if (BalanceEnemyFactory.smallEnemies > BalanceEnemyFactory.bigEnemies){
+            BalanceEnemyFactory.bigEnemies++;
+            return  new BigEnemy(); 
+        }else{
+            BalanceEnemyFactory.smallEnemies++;
+            return  new SmallEnemy(); 
+        }
+          
+    }
+}
+//RUN CODE 
+
+const balanceEnemyFactory: iEnemyFactory = new BalanceEnemyFactory();
+const enemy1 = balanceEnemyFactory.createEnemy();
+const enemy2 = balanceEnemyFactory.createEnemy();
+const enemy3 = balanceEnemyFactory.createEnemy();
+enemy1.Fire();
+enemy2.Fire();
+enemy3.Fire();
+
+
+ ```
+ ---
 # ===============================
 # Cypher <a name="Cypher"></a> ☘️ 
 # ===============================
