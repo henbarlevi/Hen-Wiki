@@ -471,8 +471,10 @@
 > - [Strategy](#designpatterns.strategy)
 > - [Decorator](#designpatterns.decorator)
 > - [Adapter](#designpatterns.adapter)
-> - [Factory Method](#designpatterns.factory-method)
 > - [Bridge](#designpatterns.designpatterns.bridge)
+> - [Factory Method](#designpatterns.factory-method)
+> - [Abstract Factory](#designpatterns.abstract-factory)
+> - [Composite](#designpatterns.composite)
 
 
 # ===============================
@@ -909,13 +911,176 @@ enemy3.Fire();
 
  ```
  ---
+ ## <b>Abstract Factory</b> <a name="designpatterns.abstract-factory"></a>
+> ### Allows you to create families of related objects without specifying a concrete class
+#### <b> Should be Used When </b> 
+- you have many objects that can be added or changed dynamically during runtime
+#### <b> Properties </b> :
+-  provide an interface for creating families of related or dependent objects without specifying concret classes
+- can model anything and have those objects interact through common interfaces
+```ts
+
+/**
+ * for example lets assume we creating enemies for a game . but each enemy can 
+ * contain only specific kinds of weapon
+ * (for example smart enemies can only use smart weapons)
+ */
+
+/**WEAPON */
+interface IWeapon {
+    fire(): void
+}
+
+abstract class Weapon implements IWeapon {
+    abstract fire(): void;
+}
+
+class smartSmallWeapon extends Weapon {
+    fire(): void {
+        console.log('shooting [smart] and [small] bullets');
+    }
+}
+class smartBigWeapon extends Weapon {
+    fire(): void {
+        console.log('shooting [smart] and [Big] bullets');
+    }
+}
+class stupidSmallWeapon extends Weapon {
+    fire(): void {
+        console.log('shooting [stupid] and [small] bullets');
+    }
+}
+class stupidBigWeapon extends Weapon {
+    fire(): void {
+        console.log('shooting [stupid] and [Big] bullets');
+    }
+}
+/**ENEMY */
+interface IEnemy {
+    Weapon: IWeapon
+    fireWeapon(): void;
+    move(): void;
+}
+
+abstract class Enemy implements IEnemy {
+    constructor(private weapon: IWeapon) { }
+    get Weapon() {
+        return this.weapon;
+    }
+    fireWeapon(): void {
+        this.weapon.fire();
+    }
+    abstract move(): void;
+}
+
+class StupidEnemy extends Enemy {
+    move(): void {
+        console.log('enemy moving [stupid] and slow')
+    }
+}
+class SmartEnemy extends Enemy {
+    move(): void {
+        console.log('enemy moving [smart] and fast')
+
+    }
+}
+
+/**ABSTRACT FACTORY */
+interface IEnemyFactory<T extends Enemy> {
+    createEnemy(weapon: IWeapon): T
+    createWeapon(): IWeapon
+}
+//factory 1
+class RandomSmartEnemyFactory implements IEnemyFactory<SmartEnemy> {
+    createEnemy(weapon: IWeapon): SmartEnemy {
+        return new SmartEnemy(weapon);
+    }
+    createWeapon(): IWeapon {
+        return Math.random() > 0.5 ? new smartBigWeapon() : new smartSmallWeapon();
+    }
+}
+//factory 1
+class RandomStupidEnemyFactory implements IEnemyFactory<StupidEnemy> {
+    createEnemy(weapon: IWeapon): StupidEnemy {
+        return new SmartEnemy(weapon);
+    }
+    createWeapon(): IWeapon {
+        return Math.random() > 0.5 ? new stupidBigWeapon() : new stupidSmallWeapon();
+    }
+}
+
+//RUN CODE 
+const smartEnemyfactory = new RandomSmartEnemyFactory();
+const smartWeapon = smartEnemyfactory.createWeapon();
+const smartEnemy = smartEnemyfactory.createEnemy(smartWeapon);
+
+smartEnemy.fireWeapon();
+smartEnemy.move();
+
+```
+---
+ ## <b>Composite</b> <a name="designpatterns.composite"></a>
+> ###  describes a group of objects that is treated the same way as a single instance of the same type of object.<br> The intent of a composite is to "compose" objects into tree structures to represent part-whole hierarchies.
+#### <b> Properties </b> :
+- the composite pattern lets clients treat individual objects and compositions uniformly
+```ts
+/**Component */
+interface SongComponent {
+    Name: string,
+    play(): void
+}
+
+/**Composite */
+//each songCollection can contain number of songCollections/individual songs
+class SongCollection implements SongComponent {
+    private collection: SongComponent[] = [];
+    get Name() { return this.name; }
+
+    constructor(private name: string) { }
+
+    play(): void {
+        console.log('Start playing the song collection ' + this.name)
+        for (let songComponent of this.collection) {
+            songComponent.play();
+        }
+    }
+    //can add a collectio of songs/song
+    add(songComponent:SongComponent){
+        this.collection.push(songComponent);
+    }
+    remove(songComponent:SongComponent){
+        const index= this.collection.indexOf(songComponent);
+        if (index > -1) {
+            this.collection.splice(index, 1);
+        }
+    }
+}
+/**Leaf */
+class Song implements SongComponent {
+    play(): void {
+        console.log('playing the song ' + this.name);
+    }
+    constructor(private name: string) { }
+    get Name() { return this.name; }
+}
+
+//RUN CODE
+const musicArchive = new SongCollection('musice archive');
+const countryCollection = new SongCollection('Rock Collection');
+const shakeyGravesCollection = new SongCollection('Shakey Graves Singer');
+shakeyGravesCollection.add(new Song('Shakey Graves - Late July'));
+shakeyGravesCollection.add(new Song('Shakey Graves - dearly departed'));
+countryCollection.add(shakeyGravesCollection);
+musicArchive.add(countryCollection);
+```
 # ===============================
 # Cypher <a name="Cypher"></a> ☘️ 
 # ===============================
 ```ts
  1 MATCH (n) DETACH DELETE (n) - delete all nodes in db
  2 MERGE (a:ACTOR {id:99}) - create this node if not exist 
- 3 MATCH (m:MOVIE {name:"fight club"}) WITH m MATCH (m)<-[:ACTED_IN]-(a:ACTOR) return m,a  - return all actors that played in the fight club movie (and the movie node)
+ 3 /*return all actors that played in the fight club movie (and the movie node):*/
+   MATCH (m:MOVIE {name:"fight club"}) WITH m MATCH (m)<-[:ACTED_IN]-(a:ACTOR) return m,a  - 
  4 MATCH (m:MOVIE {name:"fight club"}) WITH m MATCH (m)<-[:ACTED_IN]-(a:ACTOR) return m,count(a)  - return the number of actors that played in the fight club movie (and the movie node)
  5 MERGE(a:ACTOR{id:98})
         ON CREATE
