@@ -5,8 +5,9 @@
 > ### Server
 > ### Client
 ### 4. [Jquery☘️](#Jquery)
+### 5. [Angular☘️](https://github.com/henbarlevi/ang2-sbs)
 > ### DB
-### 5. [Neo4j (Cypher)☘️](#Cypher)
+### 6. [Neo4j (Cypher)☘️](#Cypher)
 
 
 
@@ -22,6 +23,7 @@
 > - [Hot Vs Cold](#Rxjs.g)
 > - [Combine Observables](#Rxjs.h)
 > - [Error Handling](#Rxjs.i)
+> - [Migrate to V6.0+](#Rxjs.V6.0)
 # ===============================
 
 ### How to create an Observable  <a name="Rxjs.a"></a>:
@@ -463,6 +465,48 @@
   }
 }
 ```
+### Migrate to Rxjs 6.0+ <a name="Rxjs.V6.0"></a>
+>  ### you can find a full guide [here](https://www.academind.com/learn/javascript/rxjs-6-what-changed/#operators-update-path)
+- ### the way we import changed :
+```ts
+//instead of
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/take';
+import 'rxjs/add/observable/of';
+//we do
+import { Observable, Subject ,of } from 'rxjs';
+import { map, take } from 'rxjs/operators';
+```
+- ### now operators must be used with pipe:
+```c
+//instead of
+myObservable
+  .map(data => data * 2)
+  .subscribe(...);
+//we do
+myObservable
+  .pipe(map(data => data * 2))
+  .subscribe(...);
+
+```
+> - #### pipe takes an infinite amount of arguments and each argument is an operator you want to apply to the Observable.
+```c
+myObservable
+  .pipe(map(data => data * 2), switchMap(...), throttle(...))
+  .subscribe(...);
+  ```
+
+So you could have a chain like this
+- ### some operators where renamed:
+> 1. #### catch() TO catchError().
+> 2. #### do() TO tap()
+> 3. #### finally() TO finalize()
+> 4. #### switch() TO switchAll()
+- ### some Observable-creation methods were renamed
+> 1. #### throw() TO throwError()
+> 2. #### fromPromise() TO from()
 # ===============================
 # Jquery <a name="Jquery"></a>☘️ 
 # ===============================
