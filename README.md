@@ -1,13 +1,14 @@
 > ### General
-### 1.  [Rxjs☘️](#Rxjs)
-### 2. [Design Patterns☘️](#designpatterns)
-### 3. [Regex☘️](#Regex☘️)
+### [Rxjs☘️](#Rxjs)
+### [Design Patterns☘️](#designpatterns)
+### [Regex☘️](#Regex☘️)
 > ### Server
+### [Docker☘️](#Docker☘️)
 > ### Client
-### 4. [Jquery☘️](#Jquery)
-### 5. [Angular☘️](https://github.com/henbarlevi/ang2-sbs)
+### [Jquery☘️](#Jquery)
+### [Angular☘️](https://github.com/henbarlevi/ang2-sbs)
 > ### DB
-### 6. [Neo4j (Cypher)☘️](#Cypher)
+### [Neo4j (Cypher)☘️](#Cypher)
 
 
 
@@ -1280,3 +1281,119 @@ alternation
 > #### special cases
 - [a-c] - all chars from a through c (NOTICE that - can behave like literal or not literal dash)
 - [^a-z] - all chars that are NOT a through (^ instead [] behave differently if its at the begining)
+
+# ===============================
+# Docker <a name="Docker"></a> ☘️ 
+# ===============================
+
+### docker commands
+* get docker version
+```
+docker -v
+```
+* create container and run it
+```
+docker run [name of image]
+example:
+docker run ubuntu 
+```
+* create container with allocate a terminal to it
+```
+docker run -it [name of image]
+example: 
+docker run -it ubuntu
+```
+* name a container
+```
+docker run -it --name  [container name] [name of image]
+example: 
+docker run -it --name mycontainer ubuntu
+```
+* list of containers running : 
+``` docker ps```
+* exit from container and close it:
+``` exit```
+* exit terminal from container but NOT close it: 
+```CTRL + P + Q ```
+* get terminal attach to container again
+```
+docker attach [container name]
+example :
+docker attach mycontainer
+```
+* delete container
+```
+docker rm [container name]
+example 
+docker rm mycontainer
+(you can also add [-f] force flag to delte it)
+```
+#### images
+* list of images : ``` docker images```
+* delete image
+```
+docker rmi [image name]
+for example: 
+docker rmi ubuntu
+(you can also add [-f] force flag to delte it)
+```
+
+#### Nodejs and Docker
+1. create file called .Dockerile
+``` DOCKERFILE
+A
+# The first thing we need to do is define from what image we want to build from. Here we will use the latest LTS (long term support) version 10 of node available from the Docker Hub:
+FROM node:10
+
+B
+# Next we create a directory to hold the application code inside the image, this will be the working directory for your application:
+WORKDIR /user/src/app
+
+# next thing will be to install npm and nodejs on the image but this image (node:10) comes with nodejs and npm already installed
+
+C
+# copy package.json file
+# NOTE - rather than copying the entire working directory, we are only copying the package.json file. in order to take advantage of cached Docker layers. http://bitjudo.com/blog/2014/03/13/building-efficient-dockerfiles-node-dot-js/ .
+COPY package*.json ./
+
+D
+# Install app dependencies
+# If you are building your code for production
+# RUN npm ci --only=productio 
+# it helps provide faster, reliable, reproducible builds for production 
+RUN npm install
+
+E
+# To bundle your app's source code inside the Docker image
+COPY . .
+
+F
+#bind app to port
+EXPOSE 3000
+
+G
+# define the command to run your app using CMD which defines your runtime. Here we will use node server.js to start your server:
+CMD [ "node", "server.js" ]
+```
+2. create a ```.dockerignore ``` file also in the app root folder
+```Dockerfile
+from
+```
+3. run command that build an image from the commands in the ```Dockerfile```
+
+```
+docker build -t [image name] [path to Dockerfile]
+for example :
+docker build -t simple-docker-image .
+```
+4. run command that create & run a container from the built image
+```
+docker run [-it] -p [outside port]:[inner exposed port] [image name]
+for example:
+docker run -it -p 3000:8080 simple-docker-image
+```
+* Running your image with -d runs the container in detached mode, leaving the container running in the background.
+* if you run the container in detached mode, more info [here](https://nodejs.org/de/docs/guides/nodejs-docker-webapp/)
+on how print the output of your app
+* -p flag redirects a public port to a private port inside the container.
+
